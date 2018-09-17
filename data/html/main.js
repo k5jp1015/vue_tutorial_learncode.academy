@@ -1,54 +1,51 @@
-// component名とhtmlのタブが紐づく
-Vue.component('friend-component',{
-    // propsとv-bindの左辺が紐づく。右辺は紐づけ先　
-    props:['friend'],
-    filters:{
-        ageInOneYear(age) {
-            return age + 1;
-        },
-        fullName(value) {
-            return `${value.last}, ${value.first}`
-        }
+const app = new Vue({
+    el:"#app",
+    data: {
+        editFriend: null,
+        friends: [],
     },
     methods:{
-        incrementAge(friend){
-            friend.age = friend.age + 1;
+        deleteFriend(id, i){
+            fetch("http://rest.learncode.academy/api/someuser/friends/" + id, {
+                method:"DELETE"
+            })
+            .then(() => {
+                this.friends.splice(i, 1);
+            })
         },
-        decrementAge(friend){
-            friend.age = friend.age - 1;
-        }
+        updateFriend(friend) {
+            fetch("http://rest.learncode.academy/api/someuser/friends/" + friend.id, {
+                body: JSON.stringify(friend),
+                method:"PUT",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+            })
+            .then(() => {
+                this.editFriend = null;
+            })
+        },
     },
-    template:`
-    <div>
-        <h4>{{friend | fullName}}</h4>
-        <h5>age: {{friend.age}}</h5>
-        <button v-on:click="incrementAge(friend)">+</button>
-        <button v-on:click="decrementAge(friend)">-</button>
-        <input v-model="friend.first"/>
-        <input v-model="friend.last"/>
-    </div>
-    `
-});
-
-const app = new Vue({
-    el: "#app",
-    data: {
-        friends: [
-            {
-                first: "Bobby",
-                last: "Booen",
-                age: 25
-            },
-            {
-                first: "John",
-                last: "Body",
-                age: 35,
-            }
-        ],
+    mounted() {
+        fetch("http://rest.learncode.academy/api/someuser/friends")
+        .then(response => response.json())
+        .then((data) => {
+            // do something
+            this.friends = data; 
+        })
     },
     template: `
     <div>
-      <friend-component v-for="item in friends" v-bind:friend="item"/>
+        <li v-for="friend, i in friends"> 
+            <div v-if="editFriend === friend.id">
+                <input v-on:keyup.13="updateFriend(friend)" v-model="friend.name" />
+                <button v-on:click="updateFriend(friend)">save</button>
+            </div>
+            <div v-else>
+                <button v-on:click="editFriend = friend.id">edit</button>
+                <button v-on:click="deleteFriend(friend.id, i)">x</button>{{friend.name}}
+            </div>
+        </li>
     </div>
     `
-})
+});
