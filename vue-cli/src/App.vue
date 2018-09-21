@@ -1,19 +1,22 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
-    <!-- HTML上ではaタブに変換される -->
-    <router-link to="friends">friends</router-link>
-    <router-link to="contact">contact</router-link>
-    <router-link to="account">account</router-link>
-    <!-- このrouter-viewタグが小さいけれど大切な違いらしい -->
-    <!-- path指定によって呼び出すコンポーネントを分けることができる -->
-    <router-view/>
+    <Navigation />
+    <Friends />
+    <FooterComponent />
   </div>
 </template>
 
 <script>
+import Navigation from './components/Navigation'
+import Friends from './components/Friends'
+import FooterComponent from './components/Footer'
 export default {
-  name: 'App'
+  name: 'app',
+  components: {
+    Navigation,
+    Friends,
+    FooterComponent,
+  }
 }
 </script>
 
@@ -24,6 +27,8 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+}
+body {
+  margin: 0;
 }
 </style>
